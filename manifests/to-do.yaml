@@ -35,6 +35,9 @@ spec:
         backend:
           serviceName: k8s-project-svc
           servicePort: 4567
+          env:
+          - name: DB_URL
+            value: "postgresql://postgres:example@postgres-svc.ping-pong:5432/postgres"
 ---
 apiVersion: v1
 kind: Service
@@ -49,3 +52,56 @@ spec:
     - port: 4567
       protocol: TCP
       targetPort: 9936
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-svc
+  namespace: to-do
+  labels:
+    app: postgres
+spec:
+  ports:
+  - port: 5432
+    name: web
+  clusterIP: None
+  selector:
+    app: postgres
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-ss
+  namespace: to-do
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:13.0
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+          - name: POSTGRES_PASSWORD
+            value: "example"
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 100Mi
