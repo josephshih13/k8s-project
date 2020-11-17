@@ -23,7 +23,7 @@ spec:
           image: josephshih13/k8s-project
           env:
           - name: DB_URL
-            value: "postgresql://postgres:example@postgres-svc.ping-pong:5432/postgres"
+            value: "postgresql://postgres:example@postgres-svc.to-do:5432/postgres"
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
