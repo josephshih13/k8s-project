@@ -21,6 +21,9 @@ spec:
       containers:
         - name: k8s-project
           image: josephshih13/k8s-project
+          env:
+          - name: DB_URL
+            value: "postgresql://postgres:example@postgres-svc.ping-pong:5432/postgres"
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -35,9 +38,6 @@ spec:
         backend:
           serviceName: k8s-project-svc
           servicePort: 4567
-          env:
-          - name: DB_URL
-            value: "postgresql://postgres:example@postgres-svc.ping-pong:5432/postgres"
 ---
 apiVersion: v1
 kind: Service
